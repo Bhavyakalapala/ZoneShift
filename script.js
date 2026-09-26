@@ -1,0 +1,19 @@
+const $=id=>document.getElementById(id);
+let migrated=false, offline={vm1:false,vm2:false}, step=0;
+const names={vm1:"VM-01",vm2:"VM-02"};
+function healthy(){return Object.values(offline).filter(v=>!v).length}
+function log(title,detail){const li=document.createElement("li");li.innerHTML=`<span class="event-dot"></span><div><b>${title}</b><small>${detail}</small></div><time>Now</time>`;$("eventLog").prepend(li)}
+function render(){
+ const count=healthy();$("modeLabel").textContent=migrated?"Availability Zones":"Availability Set";$("modelMetric").textContent=migrated?"Availability Zones":"Availability Set";$("healthMetric").textContent=`${count} of 2`;$("healthyCount").textContent=`${count} / 2 healthy`;$("zoneMetric").textContent=migrated?"2 zones":"—";$("healthHint").textContent=count===2?"All demo instances responding":count===1?"One instance offline; one responding":"No healthy instances";$("statusPill").textContent=count===0?"Service unavailable":migrated?"Zone-spread demo":count===1?"Degraded":"Legacy layout";$("statusPill").className="status "+(count===2?"success":"warning");$("lbMetric").textContent=count?"Routing to healthy VM":"No healthy target";
+ $("architectureTitle").textContent=migrated?"After migration":"Before migration";$("architectureTag").textContent=migrated?"Availability Zones":"Availability Set";
+ let left=migrated?"Zone 1":"Availability Set · Fault domain 1",right=migrated?"Zone 2":"Availability Set · Fault domain 2";
+ $("architecture").innerHTML=`<div class="lb-node"><strong>Azure Load Balancer · simulated</strong><small>${count?`Sending requests to ${count} healthy instance${count===1?"":"s"}`:"No healthy backend instances"}</small></div><div class="connector">↓　　　　　　　　　　　↓</div><div class="cluster"><h3>${left}</h3><div class="vms">${vmCard("vm1")}</div></div><div class="cluster"><h3>${right}</h3><div class="vms">${vmCard("vm2")}</div></div>`;
+ $("runbook").querySelectorAll("li").forEach((li,i)=>{li.className=i<step?"done":i===step&&step<4?"active":""});$("progressBar").style.width=(step/4*100)+"%";$("progressPercent").textContent=(step/4*100)+"%";$("progressText").textContent=step===4?"Simulation complete":step===0?"Not started":`Step ${step} of 4`;
+}
+function vmCard(id){return `<div class="vm ${offline[id]?"offline":""}"><div class="vm-head"><strong>${names[id]}</strong><span>${offline[id]?"OFFLINE":"HEALTHY"}</span></div><i></i><small>${migrated?(id==="vm1"?"Zone 1":"Zone 2"):"Availability Set"}</small></div>`}
+$("startMigration").addEventListener("click",()=>{if(step===4){log("Migration already completed","Reset to run the simulation again.");return}step++;if(step===1)log("Pre-check complete","Reviewed the current Availability Set layout.");if(step===2)log("Target prepared","Simulated two instances across separate zones.");if(step===3){migrated=true;log("Instances deployed","Demo instances are shown in separate availability zones.");}if(step===4)log("Traffic cutover complete","Simulated load balancer now targets the zone-spread instances.");render();});
+$("failVm").addEventListener("click",()=>{const id=$("failureTarget").value;if(offline[id]){log("No change",`${names[id]} is already offline.`);return}offline[id]=true;log("Instance failure simulated",`${names[id]} is offline. Load balancing reflects remaining healthy instances.`);render()});
+$("recoverVm").addEventListener("click",()=>{const id=$("failureTarget").value;if(!offline[id]){log("No change",`${names[id]} is already healthy.`);return}offline[id]=false;log("Instance recovered",`${names[id]} is healthy again.`);render()});
+$("reset").addEventListener("click",()=>{migrated=false;offline={vm1:false,vm2:false};step=0;$("eventLog").innerHTML="";log("Demo reset","Returned to the Availability Set starting state.");render()});
+$("clearLog").addEventListener("click",()=>$("eventLog").innerHTML="");
+render();

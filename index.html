@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ZoneShift | Azure Resilience Migration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">ZS</span><div><strong>ZoneShift</strong><small>Azure Resilience Migration Lab</small></div></div>
+  <span class="pill"><i></i> Demo environment</span>
+</header>
+<main class="container">
+  <section class="hero">
+    <div><p class="eyebrow">CLOUD RESILIENCE · LEARNING PROJECT</p><h1>From Availability Sets<br><em>to Availability Zones.</em></h1>
+      <p class="lead">Explore how distributing application instances across separate Azure Availability Zones can improve resilience to a datacenter-level outage.</p>
+      <div class="hero-actions"><button id="startMigration" class="primary">Run migration simulation <span>→</span></button><button id="reset" class="secondary">Reset demo</button></div>
+      <p class="notice">Simulation only — this dashboard does not create, move, or modify Azure resources.</p>
+    </div>
+    <div class="hero-stat"><span class="stat-label">CURRENT DEPLOYMENT</span><strong id="modeLabel">Availability Set</strong><span id="statusPill" class="status warning">Legacy layout</span><div class="stat-foot"><span>Application instances</span><b id="healthyCount">2 / 2 healthy</b></div></div>
+  </section>
+  <section class="metrics">
+    <article class="metric"><span>Deployment model</span><strong id="modelMetric">Availability Set</strong><small>Fault and update domains</small></article>
+    <article class="metric"><span>Healthy instances</span><strong id="healthMetric">2 of 2</strong><small id="healthHint">All demo instances responding</small></article>
+    <article class="metric"><span>Availability Zones</span><strong id="zoneMetric">—</strong><small>Separate physical locations in a region</small></article>
+    <article class="metric"><span>Load balancer</span><strong id="lbMetric">Simulated</strong><small>Routes requests to healthy instances</small></article>
+  </section>
+  <section class="section-head"><div><p class="eyebrow">ARCHITECTURE VIEW</p><h2 id="architectureTitle">Before migration</h2></div><span class="tag" id="architectureTag">Availability Set</span></section>
+  <section id="architecture" class="architecture"></section>
+  <section class="control-grid">
+    <article class="panel">
+      <div class="panel-title"><div><p class="eyebrow">RESILIENCE TEST</p><h2>Simulate an instance failure</h2></div><span class="icon">⚡</span></div>
+      <p class="muted">Take one instance offline and observe how the simulated load balancer responds.</p>
+      <div class="form-row"><label for="failureTarget">Instance</label><select id="failureTarget"><option value="vm1">VM-01</option><option value="vm2">VM-02</option></select></div>
+      <button id="failVm" class="secondary full">Take instance offline</button>
+      <button id="recoverVm" class="secondary full">Recover instance</button>
+      <p class="micro">A zone-spread design can help tolerate a zone outage only when instances, dependencies, data, and traffic routing are also designed for resilience.</p>
+    </article>
+    <article class="panel">
+      <div class="panel-title"><div><p class="eyebrow">MIGRATION RUNBOOK</p><h2>Migration progress</h2></div><span class="icon">↗</span></div>
+      <div class="progress"><div id="progressBar"></div></div><div class="progress-meta"><span id="progressText">Not started</span><b id="progressPercent">0%</b></div>
+      <ol id="runbook" class="runbook">
+        <li>Review existing Availability Set deployment</li><li>Prepare zone-based target architecture</li><li>Deploy and validate zone instances</li><li>Shift traffic and verify health</li>
+      </ol>
+    </article>
+  </section>
+  <section class="panel event-panel"><div class="panel-title"><div><p class="eyebrow">ACTIVITY</p><h2>Event log</h2></div><button id="clearLog" class="text-button">Clear log</button></div><ul id="eventLog" class="event-log"><li><span class="event-dot"></span><div><b>Demo ready</b><small>ZoneShift simulation initialized. No Azure resources were changed.</small></div><time>Now</time></li></ul></section>
+  <section class="disclaimer"><b>Project scope:</b> This is a front-end educational simulation, not a live Azure migration tool. Real migration requires planning and deploying target resources, moving application/data dependencies, testing, and a controlled traffic cutover. Availability Zones are physically separate locations within an Azure region; Availability Sets distribute VMs across fault and update domains within a datacenter.</section>
+</main>
+<footer>ZoneShift · Student project · Azure architecture demonstration</footer>
+<script src="script.js"></script>
+</body></html>
